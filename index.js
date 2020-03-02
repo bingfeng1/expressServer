@@ -12,7 +12,7 @@ const PORT = process.env.PORT || MY_PORT
 
 // api缓存
 let cache = apicache.middleware
-app.use(cache('60 minutes'))
+app.use(cache('5 minutes'))
 
 // 通过读取文件的方式，获取不同的路由
 fs.readdir(path.join(__dirname, 'routers'), (err, files) => {
@@ -24,10 +24,14 @@ fs.readdir(path.join(__dirname, 'routers'), (err, files) => {
             let routeFile = require(route)
 
             let routePath = file.split('.')[0]
+            // 配置api路由
             app.use(`/api/${routePath}`, routeFile)
+            // 配置静态文件入口
+            app.use(`/${routePath === "blog" ? "" : routePath}`, express.static(path.resolve(__dirname, 'static', routePath)))
         })
     }
 })
+
 
 // 数据库连接
 mongoose.connect(DBURL, { useNewUrlParser: true, useUnifiedTopology: true })
