@@ -15,9 +15,19 @@ docker run -p 27017:27017 -v /home/pi/docker/mongo/db:/data/db --name docker_mon
 ```
 在本项目中，使用dockerfile，进行docker部署
 ```
-docker build -t express:v1 .
-docker run -d -p 9000:9000 --name="express-app" express:v1
+FROM node
+WORKDIR /data
+RUN npm install -g cnpm --registry=https://registry.npm.taobao.org
+RUN cnpm install pm2 -g
+EXPOSE 9000
+CMD pm2 start index.js --watch
+```
+```
+docker build -t express:v2 .
+docker run -itd -p 9000:9000 -v /home/pi/Desktop/expressServer/:/data --name="express-app2" express:v2 /bin/bash
 
+// 进入bash后，通过pm2 start index.js --watch启动
+pm2 start index.js --max-memory-restart 500M --watch
 ```
 
 
