@@ -4,11 +4,14 @@ const fs = require('fs')
 const path = require('path')
 const apicache = require('apicache')
 const mongoose = require('mongoose')
+const cors = require('cors')
 
 // 配置放入配置文件中，不再上传github
 const { DBURL, MY_PORT } = require('./config.json')
 
 const PORT = process.env.PORT || MY_PORT
+
+app.use(cors({origin:'http://bingfeng.imwork.net'}))
 
 // api缓存
 let cache = apicache.middleware

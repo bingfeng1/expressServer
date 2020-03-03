@@ -1,6 +1,27 @@
 [TOC]
 
 # 所有系统的总后台服务
+注意：由于对于docker的功能不熟悉，所以这里只进行了简单的部署
+```
+// 通过docker pull 拉取node和mongo，目前只需要这两个东西，而且我这边是armv7架构，所以mongo不能使用最新的了
+docker pull node
+docker pull andresvidal/rpi3-mongodb3
+
+// 连接使用mongodb
+docker run -p 27017:27017 -v /home/pi/docker/mongo/db:/data/db --name docker_mongodb -d fc
+
+// 启动后，使用 docker exec -it 进入mongo
+// 通过mongo 进入数据库，创建响应的数据库，用户名密码即可
+```
+在本项目中，使用dockerfile，进行docker部署
+```
+docker build -t express:v1 .
+docker run -d -p 9000:9000 --name="express-app" express:v1
+
+```
+
+
+
 规则：
 - 所有ajax请求的路由，必须带有 /api ，为了与以后正式发布的静态页面防冲突
 - config.json放置所有配置信息
