@@ -7,11 +7,11 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 
 // 配置放入配置文件中，不再上传github
-const { DBURL, MY_PORT } = require('./config.json')
+const { DBURL, MY_PORT, ORIGIN } = require('./config.json')
 
 const PORT = process.env.PORT || MY_PORT
 
-app.use(cors({origin:'http://bingfeng.imwork.net'}))
+app.use(cors({ origin: ORIGIN }))
 
 // api缓存
 let cache = apicache.middleware
