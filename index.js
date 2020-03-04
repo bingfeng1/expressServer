@@ -12,10 +12,11 @@ const { DBURL, MY_PORT, ORIGIN } = require('./config.json')
 const PORT = process.env.PORT || MY_PORT
 
 app.use(cors({ origin: ORIGIN }))
+app.use(express.json())
 
 // api缓存
-let cache = apicache.middleware
-app.use(cache('5 minutes'))
+// let cache = apicache.middleware
+// app.use(cache('5 minutes'))
 
 // 通过读取文件的方式，获取不同的路由
 fs.readdir(path.join(__dirname, 'routers'), (err, files) => {
@@ -35,6 +36,8 @@ fs.readdir(path.join(__dirname, 'routers'), (err, files) => {
     }
 })
 
+// 获取静态资源
+app.use('/', express.static(path.resolve(__dirname, 'uploads')))
 
 // 数据库连接
 mongoose.connect(DBURL, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -45,6 +48,8 @@ db.on('error', () => {
 db.once('open', () => {
     console.log('连接成功')
 })
+// 取消mongoogse5的警告
+mongoose.set('useFindAndModify', false);
 
 
 app.listen(PORT, () => {

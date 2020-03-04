@@ -36,15 +36,17 @@ pm2 start index.js --max-memory-restart 500M --watch
 - 所有ajax请求的路由，必须带有 /api ，为了与以后正式发布的静态页面防冲突
 - config.json放置所有配置信息（需要自己手动新建）
 - uploads 作为上传文件系统
+  - avatar  存放头像
 - static作为静态文件访问 
 
 config.json
-分别为：数据库地址，本地服务端口，跨域的地址
+分别为：数据库地址，本地服务端口，跨域的地址，协议地址
 ```
 {
     "DBURL": "",
     "MY_PORT": "",
-    "ORIGIN: ""
+    "ORIGIN: "",
+    PROTOCOL:""
 }
 ```
 

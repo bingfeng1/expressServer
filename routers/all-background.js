@@ -4,9 +4,20 @@
 const express = require('express')
 const router = express.Router()
 const multer = require('multer')
-const upload = multer({
-    dest: 'uploads/'
+const path = require('path')
+const { getIPAddressPort } = require('../utils/utils')
+
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.resolve(__dirname, '..', 'uploads', 'avatar'))
+    },
+    filename: function (req, file, cb) {
+        const { imgName } = req.body
+        cb(null, imgName)
+    }
 })
+
+const upload = multer({ storage })
 
 // 与blog_editor使用同一个model
 const blog_editor = require('../models/blog/Editor')
@@ -26,11 +37,18 @@ router.all('/private/*', (req, res, next) => {
 // 获取作者信息
 router.get('/private/getEditor', (req, res) => {
     blog_editor.findOne((err, result) => {
+        result.avatar = `${getIPAddressPort()}/avatar/${result.avatar}`
         res.json(result)
     })
 })
 
 
+// 更新作者信息
+router.post('/private/updateEditor', upload.any('avatar'), async (req, res) => {
+    const { _id, name, imgName } = req.body
+    const result = await blog_editor.findByIdAndUpdate(_id, { name, avatar: imgName }, { new: true })
+    res.send(result)
+})
 
 
 module.exports = router
