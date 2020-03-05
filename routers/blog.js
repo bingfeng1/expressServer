@@ -8,7 +8,10 @@ const articleDetail = require('../models/blog/ArticleDetail')
 // 获取作者信息
 router.get('/getEditor', (req, res) => {
     blog_editor.findOne((err, result) => {
-        result.avatar = `/avatar/${result.avatar}`
+        // 后期需要修改为可以是本地图片，也可以是网络图片
+        if (!result.avatar.startsWith('http')) {
+            result.avatar = `/avatar/${result.avatar}`
+        }
         res.json(result)
     })
 })

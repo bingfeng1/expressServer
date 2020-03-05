@@ -15,8 +15,8 @@ app.use(cors({ origin: ORIGIN }))
 app.use(express.json())
 
 // api缓存
-// let cache = apicache.middleware
-// app.use(cache('5 minutes'))
+let cache = apicache.middleware
+app.use(cache('5 minutes'))
 
 // 通过读取文件的方式，获取不同的路由
 fs.readdir(path.join(__dirname, 'routers'), (err, files) => {
