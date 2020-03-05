@@ -7,16 +7,23 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 
 // 配置放入配置文件中，不再上传github
-const { DBURL, MY_PORT, ORIGIN } = require('./config.json')
+const { DBURL, MY_PORT, ORIGIN } = require('./config/config.json')
 
+// 先检测是否拥有配置文件中的文件夹
+const { uploadDirs } = require('./config/dirlist.json')
+const { createDir } = require('./utils/createdir')
+createDir(uploadDirs)
+
+// 设置端口号
 const PORT = process.env.PORT || MY_PORT
 
+// 跨域问题
 app.use(cors({ origin: ORIGIN }))
 app.use(express.json())
 
 // api缓存
-let cache = apicache.middleware
-app.use(cache('5 minutes'))
+// let cache = apicache.middleware
+// app.use(cache('5 minutes'))
 
 // 通过读取文件的方式，获取不同的路由
 fs.readdir(path.join(__dirname, 'routers'), (err, files) => {

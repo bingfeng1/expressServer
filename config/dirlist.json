@@ -1,0 +1,15 @@
+{
+    "uploadDirs": [
+        {
+            "dirname": "uploads",
+            "children": [
+                {
+                    "dirname": "avatar"
+                },
+                {
+                    "dirname": "articlesImg"
+                }
+            ]
+        }
+    ]
+}

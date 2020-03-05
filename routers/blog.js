@@ -9,9 +9,6 @@ const articleDetail = require('../models/blog/ArticleDetail')
 router.get('/getEditor', (req, res) => {
     blog_editor.findOne((err, result) => {
         // 后期需要修改为可以是本地图片，也可以是网络图片
-        if (!result.avatar.startsWith('http')) {
-            result.avatar = `/avatar/${result.avatar}`
-        }
         res.json(result)
     })
 })

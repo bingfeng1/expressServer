@@ -14,23 +14,4 @@ const ArticleSchema = Schema({
 
 const Article = mongoose.model('blog_article', ArticleSchema)
 
-// 模拟数据，以后需要删除
-const article = new Article({
-    title: '我的博客',    //文章标题
-    date: '2020-02-20',    //发布日期
-    group: '生活',    //所在小组
-    customerNum: 0,    //看过文章数量
-    img: '',    //文章图片
-    desc: 'abc',    //描述
-    isTop: true,    //是否置顶
-})
-
-Article.findOne({ title: '我的博客' }).then(art => {
-    if (!art) {
-        article.save().then(result => {
-            console.log(result)
-        })
-    }
-})
-
 module.exports = Article

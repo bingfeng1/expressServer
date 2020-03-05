@@ -1,6 +1,8 @@
 [TOC]
 
 # 所有系统的总后台服务
+**config/config.json必须自己手动创建，具体内容在下面有详细解释**
+后端为mongodb
 注意：由于对于docker的功能不熟悉，所以这里只进行了简单的部署
 ```
 // 通过docker pull 拉取node和mongo，目前只需要这两个东西，而且我这边是armv7架构，所以mongo不能使用最新的了
@@ -30,16 +32,18 @@ docker run -itd -p 9000:9000 -v /home/pi/Desktop/expressServer/:/data --name="ex
 pm2 start index.js --max-memory-restart 500M --watch
 ```
 
-
-
 规则：
 - 所有ajax请求的路由，必须带有 /api ，为了与以后正式发布的静态页面防冲突
 - config.json放置所有配置信息（需要自己手动新建）
 - uploads 作为上传文件系统
   - avatar  存放头像
+  - articlesImg 存放文章图片
 - static作为静态文件访问 
 
+uploads相关文件夹，必须在config/dirlist.json注册。作用是第一次启动，自动创建文件夹
+
 config.json
+位置：**config/config.json**
 分别为：数据库地址，本地服务端口，跨域的地址，协议地址
 ```
 {

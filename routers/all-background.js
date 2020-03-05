@@ -6,29 +6,35 @@ const router = express.Router()
 const multer = require('multer')
 const path = require('path')
 // const { getIPAddressPort } = require('../utils/utils')
-
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.resolve(__dirname, '..', 'uploads', 'avatar'))
-    },
-    filename: function (req, file, cb) {
-        const { imgName } = req.body
-        cb(null, imgName)
-    }
-})
-
-const upload = multer({ storage })
-
 // 与blog_editor使用同一个model
 const blog_editor = require('../models/blog/Editor')
+const blog_articles = require('../models/blog/Article')
+const blog_articleDetail = require('../models/blog/ArticleDetail')
+
+// 文件上传内容设置
+const upload = (dirname) => {
+    return multer({
+        storage: multer.diskStorage({
+            destination: function (req, file, cb) {
+                cb(null, path.resolve(__dirname, '..', 'uploads', dirname))
+            },
+            filename: function (req, file, cb) {
+                const { imgName } = req.body
+                cb(null, imgName)
+            }
+        })
+    })
+}
+
 
 // 设置所有增删改权限，只能在本地192.168.1的网段上进行修改（因为花生壳的映射，所以只要这样，就可以保证权限控制了，等以后深入后端研究，再考虑更加合适的办法）
 router.all('/private/*', (req, res, next) => {
     if (req.hostname.startsWith('192.168.1') || req.hostname === 'localhost') {
         next()
     } else {
-        res.status(401).json({
-            status: '401',
+
+        res.status(403).json({
+            status: '403',
             msg: "已在后台限制访问了，只能在我本地访问，不用点啦，看看公共页面就行啦"
         })
     }
@@ -37,18 +43,64 @@ router.all('/private/*', (req, res, next) => {
 // 获取作者信息
 router.get('/private/getEditor', (req, res) => {
     blog_editor.findOne((err, result) => {
-        result.avatar = `/avatar/${result.avatar}`
+        // 后期需要修改为可以是本地图片，也可以是网络图片
         res.json(result)
     })
 })
 
 
 // 更新作者信息
-router.post('/private/updateEditor', upload.any('avatar'), async (req, res) => {
+router.post('/private/updateEditor', upload('avatar').any(), async (req, res) => {
     const { _id, name, imgName } = req.body
-    const result = await blog_editor.findByIdAndUpdate(_id, { name, avatar: imgName }, { new: true })
+    const temp = {
+        name
+    }
+    if (imgName) {
+        temp.avatar = `/avatar/${imgName}`
+    }
+    const result = await blog_editor.findByIdAndUpdate(_id, temp, { new: true })
     res.send(result)
 })
 
+// 获取文章信息
+router.get('/private/getArticles', async (req, res) => {
+    const result = await blog_articles.find()
+    res.send(result)
+})
+
+// 添加文章信息
+router.post('/private/addArticle', upload('articlesImg').any(), async (req, res) => {
+    const { title, group, date, desc, context, isTop, imgName } = req.body
+
+    // 生成需要给数据库的格式
+    const temp = {
+        title,
+        date,
+        group,
+        desc,
+        isTop,
+    }
+    // 后期需要修改为可以是本地图片，也可以是网络图片
+    if (imgName) {
+        temp.img = `/articlesImg/${imgName}`
+    }
+
+    const article = await blog_articles.insertMany(temp)
+
+    const articleId = article[0].id
+    const articleDetail = await blog_articleDetail.insertMany({
+        articleId,
+        context
+    })
+
+    const articleDetailId = articleDetail[0].id
+
+    let status = 500
+    if (!!articleId && !!articleDetailId) {
+        status = 200
+    }
+
+    res.status(status).send({})
+})
 
 module.exports = router
