@@ -8,6 +8,7 @@ const articleDetail = require('../models/blog/ArticleDetail')
 // 获取作者信息
 router.get('/getEditor', (req, res) => {
     blog_editor.findOne((err, result) => {
+        result.avatar = `/avatar/${result.avatar}`
         res.json(result)
     })
 })
@@ -19,7 +20,7 @@ router.get('/getArticles', (req, res) => {
     })
 })
 
-// 获取文章信息
+// 获取文章详细信息
 router.get('/getArticleDetail', (req, res) => {
     const { _id } = req.query
     articleDetail.findOne({ articleId: _id }, (err, result) => {

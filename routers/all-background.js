@@ -5,7 +5,7 @@ const express = require('express')
 const router = express.Router()
 const multer = require('multer')
 const path = require('path')
-const { getIPAddressPort } = require('../utils/utils')
+// const { getIPAddressPort } = require('../utils/utils')
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -37,7 +37,7 @@ router.all('/private/*', (req, res, next) => {
 // 获取作者信息
 router.get('/private/getEditor', (req, res) => {
     blog_editor.findOne((err, result) => {
-        result.avatar = `${getIPAddressPort()}/avatar/${result.avatar}`
+        result.avatar = `/avatar/${result.avatar}`
         res.json(result)
     })
 })
