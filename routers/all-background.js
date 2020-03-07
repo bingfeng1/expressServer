@@ -33,8 +33,7 @@ router.all('/private/*', (req, res, next) => {
     if (req.hostname.startsWith('192.168.1') || req.hostname === 'localhost') {
         next()
     } else {
-
-        res.status(403).json({
+        res.send({
             status: '403',
             msg: "已在后台限制访问了，只能在我本地访问，不用点啦，看看公共页面就行啦"
         })
@@ -42,7 +41,7 @@ router.all('/private/*', (req, res, next) => {
 })
 
     // 获取作者信息
-    .get('/private/getEditor', (req, res) => {
+    .get('/getEditor', (req, res) => {
         blog_editor.findOne((err, result) => {
             // 后期需要修改为可以是本地图片，也可以是网络图片
             res.json(result)
@@ -64,7 +63,7 @@ router.all('/private/*', (req, res, next) => {
     })
 
     // 获取文章分类
-    .get('/private/getArticleGroup', async (req, res) => {
+    .get('/getArticleGroup', async (req, res) => {
         const result = await blog_article_group.find()
         res.send(result)
     })
@@ -84,7 +83,7 @@ router.all('/private/*', (req, res, next) => {
     })
 
     // 获取文章信息
-    .get('/private/getArticles', async (req, res) => {
+    .get('/getArticles', async (req, res) => {
         const result = await blog_articles.find()
         res.send(result)
     })
