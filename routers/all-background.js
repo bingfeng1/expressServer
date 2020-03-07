@@ -72,6 +72,13 @@ router.all('/private/*', (req, res, next) => {
     .post('/private/addArticleGroup', async (req, res) => {
         const { name, sort } = req.body
         const result = await blog_article_group.insertMany({ name, sort })
+        res.send(result[0])
+    })
+
+    // 修改文章分类
+    .post('/private/updateArticleGroup', async (req, res) => {
+        const { _id, name, sort } = req.body
+        const result = await blog_article_group.findByIdAndUpdate(_id, { name, sort }, { new: true })
         res.send(result)
     })
 
