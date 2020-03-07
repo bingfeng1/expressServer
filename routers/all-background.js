@@ -10,6 +10,7 @@ const path = require('path')
 const blog_editor = require('../models/blog/Editor')
 const blog_articles = require('../models/blog/Article')
 const blog_articleDetail = require('../models/blog/ArticleDetail')
+const blog_article_group = require('../models/blog/ArticleGroup')
 
 // 文件上传内容设置
 const upload = (dirname) => {
@@ -40,67 +41,87 @@ router.all('/private/*', (req, res, next) => {
     }
 })
 
-// 获取作者信息
-router.get('/private/getEditor', (req, res) => {
-    blog_editor.findOne((err, result) => {
+    // 获取作者信息
+    .get('/private/getEditor', (req, res) => {
+        blog_editor.findOne((err, result) => {
+            // 后期需要修改为可以是本地图片，也可以是网络图片
+            res.json(result)
+        })
+    })
+
+
+    // 更新作者信息
+    .post('/private/updateEditor', upload('avatar').any(), async (req, res) => {
+        const { _id, name, imgName } = req.body
+        const temp = {
+            name
+        }
+        if (imgName) {
+            temp.avatar = `/avatar/${imgName}`
+        }
+        const result = await blog_editor.findByIdAndUpdate(_id, temp, { new: true })
+        res.send(result)
+    })
+
+    // 获取文章分类
+    .get('/private/getArticleGroup', async (req, res) => {
+        const result = await blog_article_group.find()
+        res.send(result)
+    })
+
+    // 添加文章分类
+    .post('/private/addArticleGroup', async (req, res) => {
+        const { name, sort } = req.body
+        const result = await blog_article_group.insertMany({ name, sort })
+        res.send(result)
+    })
+
+    // 删除文章分类
+    .delete('/private/deleteArticleGroup', async (req, res) => {
+        const { _id } = req.body
+        const result = await blog_article_group.deleteOne({ _id })
+        res.send(result)
+    })
+
+    // 获取文章信息
+    .get('/private/getArticles', async (req, res) => {
+        const result = await blog_articles.find()
+        res.send(result)
+    })
+
+    // 添加文章信息
+    .post('/private/addArticle', upload('articlesImg').any(), async (req, res) => {
+        const { title, group, date, desc, context, isTop, imgName } = req.body
+
+        // 生成需要给数据库的格式
+        const temp = {
+            title,
+            date,
+            group,
+            desc,
+            isTop,
+        }
         // 后期需要修改为可以是本地图片，也可以是网络图片
-        res.json(result)
+        if (imgName) {
+            temp.img = `/articlesImg/${imgName}`
+        }
+
+        const article = await blog_articles.insertMany(temp)
+
+        const articleId = article[0].id
+        const articleDetail = await blog_articleDetail.insertMany({
+            articleId,
+            context
+        })
+
+        const articleDetailId = articleDetail[0].id
+
+        let status = 500
+        if (!!articleId && !!articleDetailId) {
+            status = 200
+        }
+
+        res.status(status).send({})
     })
-})
-
-
-// 更新作者信息
-router.post('/private/updateEditor', upload('avatar').any(), async (req, res) => {
-    const { _id, name, imgName } = req.body
-    const temp = {
-        name
-    }
-    if (imgName) {
-        temp.avatar = `/avatar/${imgName}`
-    }
-    const result = await blog_editor.findByIdAndUpdate(_id, temp, { new: true })
-    res.send(result)
-})
-
-// 获取文章信息
-router.get('/private/getArticles', async (req, res) => {
-    const result = await blog_articles.find()
-    res.send(result)
-})
-
-// 添加文章信息
-router.post('/private/addArticle', upload('articlesImg').any(), async (req, res) => {
-    const { title, group, date, desc, context, isTop, imgName } = req.body
-
-    // 生成需要给数据库的格式
-    const temp = {
-        title,
-        date,
-        group,
-        desc,
-        isTop,
-    }
-    // 后期需要修改为可以是本地图片，也可以是网络图片
-    if (imgName) {
-        temp.img = `/articlesImg/${imgName}`
-    }
-
-    const article = await blog_articles.insertMany(temp)
-
-    const articleId = article[0].id
-    const articleDetail = await blog_articleDetail.insertMany({
-        articleId,
-        context
-    })
-
-    const articleDetailId = articleDetail[0].id
-
-    let status = 500
-    if (!!articleId && !!articleDetailId) {
-        status = 200
-    }
-
-    res.status(status).send({})
-})
 
 module.exports = router
