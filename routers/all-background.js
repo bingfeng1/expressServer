@@ -11,6 +11,7 @@ const blog_editor = require('../models/blog/Editor')
 const blog_articles = require('../models/blog/Article')
 const blog_articleDetail = require('../models/blog/ArticleDetail')
 const blog_article_group = require('../models/blog/ArticleGroup')
+const { deleteImgFile } = require('../utils/ctrlfs')
 
 // 文件上传内容设置
 const upload = (dirname) => {
@@ -34,7 +35,7 @@ router.all('/private/*', (req, res, next) => {
         next()
     } else {
         res.send({
-            status: '403',
+            status: 403,
             msg: "已在后台限制访问了，只能在我本地访问，不用点啦，看看公共页面就行啦"
         })
     }
@@ -48,9 +49,8 @@ router.all('/private/*', (req, res, next) => {
         })
     })
 
-
     // 更新作者信息
-    .post('/private/updateEditor', upload('avatar').any(), async (req, res) => {
+    .put('/private/updateEditor', upload('avatar').any(), async (req, res) => {
         const { _id, name, imgName } = req.body
         const temp = {
             name
@@ -58,13 +58,15 @@ router.all('/private/*', (req, res, next) => {
         if (imgName) {
             temp.avatar = `/avatar/${imgName}`
         }
-        const result = await blog_editor.findByIdAndUpdate(_id, temp, { new: true })
-        res.send(result)
+        const result = await blog_editor.findByIdAndUpdate(_id, temp)
+        // 如果是本地图片的话，删除更新前的图片
+        await deleteImgFile(result.avatar)
+        res.send({ status: 200 })
     })
 
     // 获取文章分类
     .get('/getArticleGroup', async (req, res) => {
-        const result = await blog_article_group.find()
+        const result = await blog_article_group.find().sort('sort')
         res.send(result)
     })
 
@@ -115,19 +117,31 @@ router.all('/private/*', (req, res, next) => {
         const article = await blog_articles.insertMany(temp)
 
         const articleId = article[0].id
-        const articleDetail = await blog_articleDetail.insertMany({
+        await blog_articleDetail.insertMany({
             articleId,
             context
         })
 
-        const articleDetailId = articleDetail[0].id
+        res.send({})
+    })
 
-        let status = 500
-        if (!!articleId && !!articleDetailId) {
-            status = 200
+    // 删除文章（需要联动删除具体文章内容，以及上传的文章图片）
+    .delete('/private/deleteArticle', async (req, res) => {
+        const { _id } = req.body
+        try {
+            // 删除文章
+            const result = await blog_articles.findOneAndDelete({ _id })
+            // 删除文章详情页
+            await blog_articleDetail.deleteOne({ articleId: _id })
+            // 准备删除文章相关的图片
+            const { img } = result
+            // 如果是本地图片的话
+            deleteImgFile(img)
+            res.send({ status: '200' })
+        } catch (e) {
+            res.send({ status: '500', msg: '出现错误' + e })
         }
 
-        res.status(status).send({})
     })
 
 module.exports = router

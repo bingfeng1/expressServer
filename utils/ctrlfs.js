@@ -1,5 +1,8 @@
+// 用于操作文件
 const fs = require('fs')
 const path = require('path')
+
+// 根据路径生成文件夹
 const isNoFoundCreate = (dirname) => {
     const flag = fs.existsSync(dirname)
     if (!flag) {
@@ -21,7 +24,15 @@ const createDir = (dirArr, dirlastArr = []) => {
     }
 }
 
+// 删除文件
+const deleteImgFile = async img => {
+    if (img && !img.startsWith('http')) {
+        await fs.promises.unlink(path.resolve(__dirname, '..', 'uploads', ...(img.split('/'))))
+    }
+}
+
 module.exports = {
     isNoFoundCreate,
-    createDir
+    createDir,
+    deleteImgFile
 }
