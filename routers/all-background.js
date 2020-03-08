@@ -40,7 +40,7 @@ router.all('/private/*', (req, res, next) => {
         })
     }
 })
-
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!博客相关后台
     // 获取作者信息
     .get('/getEditor', (req, res) => {
         blog_editor.findOne((err, result) => {
@@ -141,7 +141,45 @@ router.all('/private/*', (req, res, next) => {
         } catch (e) {
             res.send({ status: '500', msg: '出现错误' + e })
         }
+    })
 
+    // 获取文章详细信息
+    .get('/getArticleDetail', (req, res) => {
+        const { _id } = req.query
+        blog_articleDetail.findOne({ articleId: _id }, (err, result) => {
+            res.json(result)
+        })
+    })
+
+    // 更新文章详细信息
+    .put('/private/updateArticle', upload('articlesImg').any(), async (req, res) => {
+        const { _id, title, group, date, desc, context, isTop, imgName } = req.body
+
+        // 生成需要给数据库的格式
+        const temp = {
+            title,
+            date,
+            group,
+            desc,
+            isTop,
+        }
+        // 后期需要修改为可以是本地图片，也可以是网络图片
+        if (imgName) {
+            temp.img = `/articlesImg/${imgName}`
+        }
+
+        const article = await blog_articles.findOneAndUpdate({ _id }, temp)
+        if (imgName) {
+            // 如果是本地图片的话，删除更新前的图片
+            await deleteImgFile(article.img)
+        }
+
+        const articleId = article.id
+        await blog_articleDetail.findOneAndUpdate({ articleId }, {
+            context
+        })
+
+        res.send({})
     })
 
 module.exports = router
