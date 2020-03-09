@@ -70,11 +70,13 @@ config.json
 - getEditor：获取作者信息
 - getArticles：获取文章列表
 - getArticleDetail：获取文章详细信息
+- getArticleGroup：获取文章分组
+- getExtendLink：获取扩展链接
 
 # 数据库字典
 ## blog
 
-blog_article
+blog_articles
 
 | 字段名称    | 类型    | 意义         |
 | ----------- | ------- | ------------ |
@@ -86,7 +88,7 @@ blog_article
 | desc        | String  | 描述         |
 | isTop       | Boolean | 是否置顶     |
 
-blog_editor
+blog_editors
 
 | 字段名称        | 类型    | 意义                           |
 | --------------- | ------- | ------------------------------ |
@@ -98,19 +100,27 @@ blog_editor
 | sc_obj.url      | String  | 具体地址                       |
 | customerNum     | Number  | 总访问次数                     |
 
-blog_article_detail
+blog_article_details
 
 | 字段名称  | 类型   | 意义                 |
 | --------- | ------ | -------------------- |
 | articleId | String | 关联blog_article的id |
 | context   | String | markdown语法的文章   |
 
-blog_article_group_type
+blog_article_groups
 
 | 字段名称 | 类型   | 意义     |
 | -------- | ------ | -------- |
 | name     | String | 分类名称 |
 | sort     | Number | 分类顺序 |
+
+
+background_extend_links
+
+| 字段名称 | 类型   | 意义     |
+| -------- | ------ | -------- |
+| name     | String | 链接名称 |
+| url      | String | 链接地址 |
 
 # 总后端系统
 > 根路由：/api/all-background
@@ -123,5 +133,5 @@ blog_article_group_type
 - /private/getArticleGroup：获取文章分类
 - /private/addArticleGroup：添加文章分类
 - /private/deleteArticleGroup：删除文章分类
-
+  
 **这里文件上传功能的文件夹，必须与config/dirlist.json中的配置一致**

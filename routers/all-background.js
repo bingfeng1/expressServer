@@ -11,6 +11,7 @@ const blog_editor = require('../models/blog/Editor')
 const blog_articles = require('../models/blog/Article')
 const blog_articleDetail = require('../models/blog/ArticleDetail')
 const blog_article_group = require('../models/blog/ArticleGroup')
+const background_extend_link = require('../models/extend/ExtendLink')
 const { deleteImgFile } = require('../utils/ctrlfs')
 
 // 文件上传内容设置
@@ -180,6 +181,33 @@ router.all('/private/*', (req, res, next) => {
         })
 
         res.send({})
+    })
+
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!扩展功能
+    // 获取扩展链接
+    .get('/getExtendLink', async (req, res) => {
+        const result = await background_extend_link.find()
+        res.send(result)
+    })
+    // 添加扩展链接
+    .post('/private/addExtendLink', async (req, res) => {
+        const { name, url } = req.body
+        const result = await background_extend_link.insertMany({ name, url })
+        res.send(result[0])
+    })
+
+    // 修改扩展链接
+    .put('/private/updateExtendLink', async (req, res) => {
+        const { _id, name, url } = req.body
+        const result = await background_extend_link.findByIdAndUpdate(_id, { name, url }, { new: true })
+        res.send(result)
+    })
+
+    // 删除扩展链接
+    .delete('/private/deleteExtendLink', async (req, res) => {
+        const { _id } = req.body
+        const result = await background_extend_link.deleteOne({ _id })
+        res.send(result)
     })
 
 module.exports = router
