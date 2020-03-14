@@ -26,3 +26,4 @@ yarn-error.log*
 config.json
 /uploads
 /static
+/logs
