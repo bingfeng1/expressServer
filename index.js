@@ -45,6 +45,8 @@ fs.readdir(path.join(__dirname, 'routers'), (err, files) => {
 
 // 获取静态资源
 app.use('/', express.static(path.resolve(__dirname, 'uploads')))
+// vue版本个人博客，因为与react同步，所以用了同一个api
+app.use('/blog-vue', express.static(path.resolve(__dirname, 'static', 'blog-vue')))
 
 // 数据库连接
 mongoose.connect(DBURL, { useNewUrlParser: true, useUnifiedTopology: true })
