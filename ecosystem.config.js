@@ -1,19 +1,18 @@
 module.exports = {
-  apps : [{
+  apps: [{
     name: 'API',
     script: 'index.js',
     autorestart: true,
     watch: true,
     max_memory_restart: '500M',
     ignore_watch: [
-        "node_modules",
-        "uploads",
-        "logs",
-	".git",
-	"static"
-	
+      "node_modules",
+      "uploads",
+      "logs",
+      ".git",
+      "static"
     ],
     error_file: "./logs/app-err.log",
     out_file: "./logs/app-out.log"
-    }]
+  }]
 };
