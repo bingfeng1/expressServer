@@ -58,7 +58,7 @@ config.json
 用了缓存，不过目前先停用了，主要都是在本地测试，造成一些影响了
 
 # utils创建了一些通用功能服务
-- createdir.js
+- controlFileSystem.js
   - isNoFoundCreate：如果文件不存在，那就创建，因为在根目录中index引用，所以是相对于根目录
   - createDir：递归生成目录，应该可以多层创建
 - utils.js
@@ -133,5 +133,35 @@ background_extend_links
 - /private/getArticleGroup：获取文章分类
 - /private/addArticleGroup：添加文章分类
 - /private/deleteArticleGroup：删除文章分类
+- /getTimedTask：获取定时任务列表
+- /private/changeTimedTask：改变定时任务是否启动
   
 **这里文件上传功能的文件夹，必须与config/dirlist.json中的配置一致**
+
+
+# 使用第三方接口查询数据
+**目录threeParty为第三方接口汇聚**
+## tianxing 天行接口数据
+- index.js  获取第三方数据入库
+  - getNcov：获取疫情数据
+  - startGetNcov：开始获取疫情的定时任务
+  - stopGetNcov：取消疫情的定时任务
+- dealData.js 从第三方接口获取数据
+  - getNcovData：获取疫情数据，入库或者更新操作
+
+# 触发循环事件
+- config/timedTask.js 公共事件名称
+每次启动服务，默认不触发事件循环
+- timedTask/index.js：定时任务的集成，有点类似react-redux的做法
+通过闭包，触发循环事件，以便以可以随时停止任务
+
+
+## 字典
+  
+timed_tasks
+
+| 字段名称 | 类型    | 意义           |
+| -------- | ------- | -------------- |
+| name     | String  | 定时任务名称   |
+| desc     | String  | 定时任务描述   |
+| flag     | Boolean | 定时器是否开启 |

@@ -12,7 +12,16 @@ const blog_articles = require('../models/blog/Article')
 const blog_articleDetail = require('../models/blog/ArticleDetail')
 const blog_article_group = require('../models/blog/ArticleGroup')
 const background_extend_link = require('../models/extend/ExtendLink')
-const { deleteImgFile } = require('../utils/ctrlfs')
+const { deleteImgFile } = require('../utils/controlFileSystem')
+const mongodb_task = require('../models/background/Task')
+const mongodb_ncov = require('../models/background/Ncov')
+const timedTask = require('../timedTask')
+const { NCOV } = require('../config/timedTask')
+
+// 定时任务
+const timedTask_Map = new Map()
+// 新冠病毒定时任务
+timedTask_Map.set(NCOV, timedTask(NCOV)())
 
 // 文件上传内容设置
 const upload = (dirname) => {
@@ -207,6 +216,36 @@ router.all('/private/*', (req, res, next) => {
     .delete('/private/deleteExtendLink', async (req, res) => {
         const { _id } = req.body
         const result = await background_extend_link.deleteOne({ _id })
+        res.send(result)
+    })
+
+    // 获取定时任务
+    .get('/getTimedTask', async (req, res) => {
+        const result = await mongodb_task.find()
+        res.send(result)
+    })
+
+    // 改变定时任务是否启动
+    .put('/private/changeTimedTask', async (req, res) => {
+        const { flag, _id, name } = req.body
+        if (!flag) {
+            let tempTask = timedTask_Map.get(name)
+            tempTask.start()
+            const result = await mongodb_task.findByIdAndUpdate(_id, { flag: true }, { new: true })
+            res.send(result)
+        } else {
+            let tempTask = timedTask_Map.get(name)
+            tempTask.stop()
+            const result = await mongodb_task.findByIdAndUpdate(_id, { flag: false }, { new: true })
+            res.send(result)
+        }
+
+    })
+
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!第三方服务
+    // 新冠状病毒信息获取
+    .get('/getNcov', async (req, res) => {
+        const result = await mongodb_ncov.find(null, null, { sort: '-date', limit: 1 })
         res.send(result)
     })
 

@@ -11,7 +11,7 @@ const { DBURL, MY_PORT, ORIGIN } = require('./config/config.json')
 
 // 先检测是否拥有配置文件中的文件夹
 const { uploadDirs } = require('./config/dirlist.json')
-const { createDir } = require('./utils/ctrlfs')
+const { createDir } = require('./utils/controlFileSystem')
 createDir(uploadDirs)
 
 // 设置端口号
