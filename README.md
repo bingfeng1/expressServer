@@ -135,12 +135,14 @@ background_extend_links
 - /private/deleteArticleGroup：删除文章分类
 - /getTimedTask：获取定时任务列表
 - /private/changeTimedTask：改变定时任务是否启动
+- /getNcov：获取病毒信息
+- /getComputerInfo：获取计算机信息
   
 **这里文件上传功能的文件夹，必须与config/dirlist.json中的配置一致**
 
 
 # 使用第三方接口查询数据
-**目录threeParty为第三方接口汇聚**
+**目录otherData为第三方接口汇聚**
 ## tianxing 天行接口数据
 - index.js  获取第三方数据入库
   - getNcov：获取疫情数据
@@ -148,6 +150,10 @@ background_extend_links
   - stopGetNcov：取消疫情的定时任务
 - dealData.js 从第三方接口获取数据
   - getNcovData：获取疫情数据，入库或者更新操作
+
+## 系统数据接口
+- system/index.js 获取服务器相关信息
+  - computerInfo打包后的信息
 
 # 触发循环事件
 - config/timedTask.js 公共事件名称

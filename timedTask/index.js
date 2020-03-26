@@ -1,6 +1,6 @@
 // 定时任务，数据库与程序对应汇总
 const { NCOV } = require('../config/timedTask')
-const { startGetNcov, stopGetNcov } = require('../threeParty/tianxing')
+const { startGetNcov, stopGetNcov } = require('../otherData/tianxing')
 
 // 定时任务的集成，有点类似react-redux的做法
 const timedTask = task => {
@@ -25,4 +25,10 @@ const timedTask = task => {
     })
 }
 
-module.exports = timedTask
+
+// 定时任务
+const timedTask_Map = new Map()
+// 新冠病毒定时任务
+timedTask_Map.set(NCOV, timedTask(NCOV)())
+
+module.exports = timedTask_Map

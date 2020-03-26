@@ -6,22 +6,20 @@ const router = express.Router()
 const multer = require('multer')
 const path = require('path')
 // const { getIPAddressPort } = require('../utils/utils')
-// 与blog_editor使用同一个model
-const blog_editor = require('../models/blog/Editor')
-const blog_articles = require('../models/blog/Article')
-const blog_articleDetail = require('../models/blog/ArticleDetail')
-const blog_article_group = require('../models/blog/ArticleGroup')
-const background_extend_link = require('../models/extend/ExtendLink')
-const { deleteImgFile } = require('../utils/controlFileSystem')
+// 与mongodb_editor使用同一个model
+const mongodb_editor = require('../models/blog/Editor')
+const mongodb_articles = require('../models/blog/Article')
+const mongodb_articleDetail = require('../models/blog/ArticleDetail')
+const mongodb_article_group = require('../models/blog/ArticleGroup')
+const mongodb_extend_link = require('../models/extend/ExtendLink')
 const mongodb_task = require('../models/background/Task')
 const mongodb_ncov = require('../models/background/Ncov')
-const timedTask = require('../timedTask')
-const { NCOV } = require('../config/timedTask')
-
-// 定时任务
-const timedTask_Map = new Map()
-// 新冠病毒定时任务
-timedTask_Map.set(NCOV, timedTask(NCOV)())
+// 封装的文件系统
+const { deleteImgFile } = require('../utils/controlFileSystem')
+// 后端定时任务
+const timedTask_Map = require('../timedTask')
+// 服务器系统数据
+const { computerInfo } = require('../otherData/system')
 
 // 文件上传内容设置
 const upload = (dirname) => {
@@ -53,7 +51,7 @@ router.all('/private/*', (req, res, next) => {
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!博客相关后台
     // 获取作者信息
     .get('/getEditor', (req, res) => {
-        blog_editor.findOne((err, result) => {
+        mongodb_editor.findOne((err, result) => {
             // 后期需要修改为可以是本地图片，也可以是网络图片
             res.json(result)
         })
@@ -68,7 +66,7 @@ router.all('/private/*', (req, res, next) => {
         if (imgName) {
             temp.avatar = `/avatar/${imgName}`
         }
-        const result = await blog_editor.findByIdAndUpdate(_id, temp)
+        const result = await mongodb_editor.findByIdAndUpdate(_id, temp)
         // 如果是本地图片的话，删除更新前的图片
         await deleteImgFile(result.avatar)
         res.send({ status: 200 })
@@ -76,34 +74,34 @@ router.all('/private/*', (req, res, next) => {
 
     // 获取文章分类
     .get('/getArticleGroup', async (req, res) => {
-        const result = await blog_article_group.find().sort('sort')
+        const result = await mongodb_article_group.find().sort('sort')
         res.send(result)
     })
 
     // 添加文章分类
     .post('/private/addArticleGroup', async (req, res) => {
         const { name, sort } = req.body
-        const result = await blog_article_group.insertMany({ name, sort })
+        const result = await mongodb_article_group.insertMany({ name, sort })
         res.send(result[0])
     })
 
     // 修改文章分类
     .post('/private/updateArticleGroup', async (req, res) => {
         const { _id, name, sort } = req.body
-        const result = await blog_article_group.findByIdAndUpdate(_id, { name, sort }, { new: true })
+        const result = await mongodb_article_group.findByIdAndUpdate(_id, { name, sort }, { new: true })
         res.send(result)
     })
 
     // 删除文章分类
     .delete('/private/deleteArticleGroup', async (req, res) => {
         const { _id } = req.body
-        const result = await blog_article_group.deleteOne({ _id })
+        const result = await mongodb_article_group.deleteOne({ _id })
         res.send(result)
     })
 
     // 获取文章信息
     .get('/getArticles', async (req, res) => {
-        const result = await blog_articles.find()
+        const result = await mongodb_articles.find()
         res.send(result)
     })
 
@@ -124,10 +122,10 @@ router.all('/private/*', (req, res, next) => {
             temp.img = `/articlesImg/${imgName}`
         }
 
-        const article = await blog_articles.insertMany(temp)
+        const article = await mongodb_articles.insertMany(temp)
 
         const articleId = article[0].id
-        await blog_articleDetail.insertMany({
+        await mongodb_articleDetail.insertMany({
             articleId,
             context
         })
@@ -140,9 +138,9 @@ router.all('/private/*', (req, res, next) => {
         const { _id } = req.body
         try {
             // 删除文章
-            const result = await blog_articles.findOneAndDelete({ _id })
+            const result = await mongodb_articles.findOneAndDelete({ _id })
             // 删除文章详情页
-            await blog_articleDetail.deleteOne({ articleId: _id })
+            await mongodb_articleDetail.deleteOne({ articleId: _id })
             // 准备删除文章相关的图片
             const { img } = result
             // 如果是本地图片的话
@@ -156,7 +154,7 @@ router.all('/private/*', (req, res, next) => {
     // 获取文章详细信息
     .get('/getArticleDetail', (req, res) => {
         const { _id } = req.query
-        blog_articleDetail.findOne({ articleId: _id }, (err, result) => {
+        mongodb_articleDetail.findOne({ articleId: _id }, (err, result) => {
             res.json(result)
         })
     })
@@ -178,14 +176,14 @@ router.all('/private/*', (req, res, next) => {
             temp.img = `/articlesImg/${imgName}`
         }
 
-        const article = await blog_articles.findOneAndUpdate({ _id }, temp)
+        const article = await mongodb_articles.findOneAndUpdate({ _id }, temp)
         if (imgName) {
             // 如果是本地图片的话，删除更新前的图片
             await deleteImgFile(article.img)
         }
 
         const articleId = article.id
-        await blog_articleDetail.findOneAndUpdate({ articleId }, {
+        await mongodb_articleDetail.findOneAndUpdate({ articleId }, {
             context
         })
 
@@ -195,27 +193,27 @@ router.all('/private/*', (req, res, next) => {
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!扩展功能
     // 获取扩展链接
     .get('/getExtendLink', async (req, res) => {
-        const result = await background_extend_link.find()
+        const result = await mongodb_extend_link.find()
         res.send(result)
     })
     // 添加扩展链接
     .post('/private/addExtendLink', async (req, res) => {
         const { name, url } = req.body
-        const result = await background_extend_link.insertMany({ name, url })
+        const result = await mongodb_extend_link.insertMany({ name, url })
         res.send(result[0])
     })
 
     // 修改扩展链接
     .put('/private/updateExtendLink', async (req, res) => {
         const { _id, name, url } = req.body
-        const result = await background_extend_link.findByIdAndUpdate(_id, { name, url }, { new: true })
+        const result = await mongodb_extend_link.findByIdAndUpdate(_id, { name, url }, { new: true })
         res.send(result)
     })
 
     // 删除扩展链接
     .delete('/private/deleteExtendLink', async (req, res) => {
         const { _id } = req.body
-        const result = await background_extend_link.deleteOne({ _id })
+        const result = await mongodb_extend_link.deleteOne({ _id })
         res.send(result)
     })
 
@@ -249,4 +247,25 @@ router.all('/private/*', (req, res, next) => {
         res.send(result)
     })
 
+    .get('/getComputerInfo', async (req, res) => {
+        const {
+            freemem,
+            totalmem,
+            uptime,
+            cpuUsage,
+            compouterDrive
+        } = computerInfo
+        const _cpuUsage = await cpuUsage()
+        const _freemem = freemem()
+        const _totalmem = totalmem()
+        const _uptime = uptime()
+        const _compouterDrive = await compouterDrive()
+        res.send({
+            _cpuUsage,
+            _freemem,
+            _totalmem,
+            _uptime,
+            _compouterDrive
+        })
+    })
 module.exports = router
