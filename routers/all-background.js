@@ -21,6 +21,8 @@ const timedTask_Map = require('../timedTask')
 // 服务器系统数据
 const { computerInfo } = require('../otherData/system')
 
+const axios = require('axios')
+
 // 文件上传内容设置
 const upload = (dirname) => {
     return multer({
@@ -247,6 +249,7 @@ router.all('/private/*', (req, res, next) => {
         res.send(result)
     })
 
+    // 获取服务器信息
     .get('/getComputerInfo', async (req, res) => {
         const {
             freemem,
@@ -267,5 +270,16 @@ router.all('/private/*', (req, res, next) => {
             _uptime,
             _compouterDrive
         })
+    })
+
+    // 获取腾讯疫情接口
+    .get('/getTXNcovInfo', async (req, res) => {
+        const { data = "" } = await axios.get('https://view.inews.qq.com/g2/getOnsInfo?name=disease_h5')
+        if (data) {
+            const result = JSON.parse(data.data)
+            res.send(result)
+        }else{
+            res.status(500).send()
+        }
     })
 module.exports = router

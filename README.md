@@ -137,6 +137,7 @@ background_extend_links
 - /private/changeTimedTask：改变定时任务是否启动
 - /getNcov：获取病毒信息
 - /getComputerInfo：获取计算机信息
+- /getTXNcovInfo：获取腾讯疫情接口
   
 **这里文件上传功能的文件夹，必须与config/dirlist.json中的配置一致**
 

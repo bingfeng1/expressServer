@@ -22,8 +22,14 @@ const cpuUsage = () => cpu.usage()
 const compouterDrive = () => {
     if (platform === 'linux') {
         return drive.info()
-    }else{
-        return platform
+    } else {
+        return {
+            totalGb: '0',
+            usedGb: '0',
+            freeGb: '0',
+            usedPercentage: '0',
+            freePercentage: '0'
+        }
     }
 }
 
