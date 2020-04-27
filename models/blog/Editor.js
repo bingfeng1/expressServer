@@ -16,4 +16,17 @@ const EditorSchema = Schema({
 
 const Editor = mongoose.model('blog_editor', EditorSchema)
 
+const temp = new Editor({
+    name: '冰风',
+    avatar:'https://i2.hdslb.com/bfs/face/61ec92b855b89b2b9bcc2e60a51ce4e9edd4640a.jpg@150w_150h.jpg'
+})
+
+Editor.findOne({name:'冰风'}).then((t)=>{
+    if(!t){
+        Editor.insertMany(temp).then((c)=>{
+            console.log(c)
+        })
+    }
+})
+
 module.exports = Editor

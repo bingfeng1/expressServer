@@ -22,9 +22,18 @@ const ncov = new Task({
     flag: false
 })
 
-// 每次启动，定时器不自动开启
-Task.updateOne({ name: NCOV }, ncov, {
-    upsert: true
+Task.findOne({ name: NCOV }).then((t) => {
+    if (!t) {
+        Task.insertMany(ncov).then((c) => {
+            console.log(c)
+        })
+    } else {
+        // 每次启动，定时器不自动开启
+        Task.updateOne({ name: NCOV }, ncov, {
+            upsert: true
+        })
+    }
 })
+
 
 module.exports = Task
