@@ -1,15 +1,35 @@
-{
-    "uploadDirs": [
-        {
-            "dirname": "uploads",
-            "children": [
-                {
-                    "dirname": "avatar"
-                },
-                {
-                    "dirname": "articlesImg"
-                }
-            ]
+[
+    {
+        "dirname": "uploads",
+        "children": [
+            {
+                "dirname": "avatar"
+            },
+            {
+                "dirname": "articlesImg"
+            }
+        ]
+    },
+    {
+        "dirname": "config",
+        "filename": "config.json",
+        "text": {
+            "DBURL": "你的数据库地址",
+            "MY_PORT": "",
+            "ORIGIN": "",
+            "PROTOCOL": ""
         }
-    ]
-}
+    },
+    {
+        "dirname": "otherData",
+        "children": [
+            {
+                "dirname": "tianxing",
+                "filename": "config.json",
+                "text": {
+                    "key": "你的天行数据接口key"
+                }
+            }
+        ]
+    }
+]

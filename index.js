@@ -6,16 +6,17 @@ const apicache = require('apicache')
 const mongoose = require('mongoose')
 const cors = require('cors')
 
+// 先检测是否拥有配置文件中的文件夹
+const initDirAndFile = require('./config/dirlist.json')
+const { createDir } = require('./utils/controlFileSystem')
+createDir(initDirAndFile)
+
+
 // 配置放入配置文件中，不再上传github
 const { DBURL, MY_PORT, ORIGIN } = require('./config/config.json')
 
-// 先检测是否拥有配置文件中的文件夹
-const { uploadDirs } = require('./config/dirlist.json')
-const { createDir } = require('./utils/controlFileSystem')
-createDir(uploadDirs)
-
 // 设置端口号
-const PORT = process.env.PORT || MY_PORT
+const PORT = process.env.PORT || MY_PORT || 9000
 
 // 跨域问题
 app.use(cors({ origin: ORIGIN }))
@@ -49,16 +50,21 @@ app.use('/', express.static(path.resolve(__dirname, 'uploads')))
 app.use('/blog-vue', express.static(path.resolve(__dirname, 'static', 'blog-vue')))
 
 // 数据库连接
-mongoose.connect(DBURL, { useNewUrlParser: true, useUnifiedTopology: true })
-var db = mongoose.connection
-db.on('error', () => {
-    console.error('连接失败')
-})
-db.once('open', () => {
-    console.log('连接成功')
-})
-// 取消mongoogse5的警告
-mongoose.set('useFindAndModify', false);
+if (DBURL !== "你的数据库地址") {
+
+    mongoose.connect(DBURL, { useNewUrlParser: true, useUnifiedTopology: true })
+    var db = mongoose.connection
+    db.on('error', () => {
+        console.error('连接失败')
+    })
+    db.once('open', () => {
+        console.log('连接成功')
+    })
+    // 取消mongoogse5的警告
+    mongoose.set('useFindAndModify', false);
+} else {
+    console.log('记得在config/config.json中添加数据库地址')
+}
 
 
 app.listen(PORT, () => {
