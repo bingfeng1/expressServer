@@ -38,21 +38,11 @@ const upload = (dirname) => {
     })
 }
 
-
 // 设置所有增删改权限，只能在本地192.168.1的网段上进行修改（因为花生壳的映射，所以只要这样，就可以保证权限控制了，等以后深入后端研究，再考虑更加合适的办法）
-router.all('/private/*', (req, res, next) => {
-    if (req.hostname.startsWith('192.168.1') || req.hostname === 'localhost') {
-        next()
-    } else {
-        res.send({
-            status: 403,
-            msg: "已在后台限制访问了，只能在我本地访问，不用点啦，看看公共页面就行啦"
-        })
-    }
-})
+router
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!博客相关后台
     // 获取作者信息
-    .get('/getEditor', (req, res) => {
+    .get('/editor', (req, res) => {
         mongodb_editor.findOne((err, result) => {
             // 后期需要修改为可以是本地图片，也可以是网络图片
             res.json(result)
@@ -60,7 +50,7 @@ router.all('/private/*', (req, res, next) => {
     })
 
     // 更新作者信息
-    .put('/private/updateEditor', upload('avatar').any(), async (req, res) => {
+    .put('/editor', upload('avatar').any(), async (req, res) => {
         const { _id, name, imgName } = req.body
         const temp = {
             name
@@ -75,40 +65,40 @@ router.all('/private/*', (req, res, next) => {
     })
 
     // 获取文章分类
-    .get('/getArticleGroup', async (req, res) => {
+    .get('/articleGroup', async (req, res) => {
         const result = await mongodb_article_group.find().sort('sort')
         res.send(result)
     })
 
     // 添加文章分类
-    .post('/private/addArticleGroup', async (req, res) => {
+    .post('/articleGroup', async (req, res) => {
         const { name, sort } = req.body
         const result = await mongodb_article_group.insertMany({ name, sort })
         res.send(result[0])
     })
 
     // 修改文章分类
-    .post('/private/updateArticleGroup', async (req, res) => {
+    .put('/articleGroup', async (req, res) => {
         const { _id, name, sort } = req.body
         const result = await mongodb_article_group.findByIdAndUpdate(_id, { name, sort }, { new: true })
         res.send(result)
     })
 
     // 删除文章分类
-    .delete('/private/deleteArticleGroup', async (req, res) => {
+    .delete('/articleGroup', async (req, res) => {
         const { _id } = req.body
         const result = await mongodb_article_group.deleteOne({ _id })
         res.send(result)
     })
 
     // 获取文章信息
-    .get('/getArticles', async (req, res) => {
+    .get('/articles', async (req, res) => {
         const result = await mongodb_articles.find()
         res.send(result)
     })
 
     // 添加文章信息
-    .post('/private/addArticle', upload('articlesImg').any(), async (req, res) => {
+    .post('/articles', upload('articlesImg').any(), async (req, res) => {
         const { title, group, date, desc, context, isTop, imgName } = req.body
 
         // 生成需要给数据库的格式
@@ -136,7 +126,7 @@ router.all('/private/*', (req, res, next) => {
     })
 
     // 删除文章（需要联动删除具体文章内容，以及上传的文章图片）
-    .delete('/private/deleteArticle', async (req, res) => {
+    .delete('/articles', async (req, res) => {
         const { _id } = req.body
         try {
             // 删除文章
@@ -154,7 +144,7 @@ router.all('/private/*', (req, res, next) => {
     })
 
     // 获取文章详细信息
-    .get('/getArticleDetail', (req, res) => {
+    .get('/articleDetail', (req, res) => {
         const { _id } = req.query
         mongodb_articleDetail.findOne({ articleId: _id }, (err, result) => {
             res.json(result)
@@ -162,7 +152,7 @@ router.all('/private/*', (req, res, next) => {
     })
 
     // 更新文章详细信息
-    .put('/private/updateArticle', upload('articlesImg').any(), async (req, res) => {
+    .put('/articleDetail', upload('articlesImg').any(), async (req, res) => {
         const { _id, title, group, date, desc, context, isTop, imgName } = req.body
 
         // 生成需要给数据库的格式
@@ -194,39 +184,39 @@ router.all('/private/*', (req, res, next) => {
 
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!扩展功能
     // 获取扩展链接
-    .get('/getExtendLink', async (req, res) => {
+    .get('/extendLink', async (req, res) => {
         const result = await mongodb_extend_link.find()
         res.send(result)
     })
     // 添加扩展链接
-    .post('/private/addExtendLink', async (req, res) => {
+    .post('/extendLink', async (req, res) => {
         const { name, url } = req.body
         const result = await mongodb_extend_link.insertMany({ name, url })
         res.send(result[0])
     })
 
     // 修改扩展链接
-    .put('/private/updateExtendLink', async (req, res) => {
+    .put('/extendLink', async (req, res) => {
         const { _id, name, url } = req.body
         const result = await mongodb_extend_link.findByIdAndUpdate(_id, { name, url }, { new: true })
         res.send(result)
     })
 
     // 删除扩展链接
-    .delete('/private/deleteExtendLink', async (req, res) => {
+    .delete('/extendLink', async (req, res) => {
         const { _id } = req.body
         const result = await mongodb_extend_link.deleteOne({ _id })
         res.send(result)
     })
 
     // 获取定时任务
-    .get('/getTimedTask', async (req, res) => {
+    .get('/timedTask', async (req, res) => {
         const result = await mongodb_task.find()
         res.send(result)
     })
 
     // 改变定时任务是否启动
-    .put('/private/changeTimedTask', async (req, res) => {
+    .put('/timedTask', async (req, res) => {
         const { flag, _id, name } = req.body
         if (!flag) {
             let tempTask = timedTask_Map.get(name)
@@ -244,13 +234,13 @@ router.all('/private/*', (req, res, next) => {
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!第三方服务
     // 新冠状病毒信息获取
-    .get('/getNcov', async (req, res) => {
+    .get('/ncov', async (req, res) => {
         const result = await mongodb_ncov.find(null, null, { sort: '-date', limit: 1 })
         res.send(result)
     })
 
     // 获取服务器信息
-    .get('/getComputerInfo', async (req, res) => {
+    .get('/computerInfo', async (req, res) => {
         const {
             freemem,
             totalmem,
@@ -273,7 +263,7 @@ router.all('/private/*', (req, res, next) => {
     })
 
     // 获取腾讯疫情接口
-    .get('/getTXNcovInfo', async (req, res) => {
+    .get('/TXNcovInfo', async (req, res) => {
         const { data = "" } = await axios.get('https://view.inews.qq.com/g2/getOnsInfo?name=disease_h5')
         if (data) {
             const result = JSON.parse(data.data)

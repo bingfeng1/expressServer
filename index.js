@@ -26,6 +26,17 @@ app.use(express.json())
 // let cache = apicache.middleware
 // app.use(cache('5 minutes'))
 
+function privateMiddleWare(req, res, next) {
+    if (req.hostname.startsWith('192.168.1') || req.hostname === 'localhost') {
+        next()
+    } else {
+        res.send({
+            status: 403,
+            msg: "已在后台限制访问了，只能在我本地访问，不用点啦，看看公共页面就行啦"
+        })
+    }
+}
+
 // 通过读取文件的方式，获取不同的路由
 fs.readdir(path.join(__dirname, 'routers'), (err, files) => {
     if (err) {
@@ -37,7 +48,7 @@ fs.readdir(path.join(__dirname, 'routers'), (err, files) => {
 
             let routePath = file.split('.')[0]
             // 配置api路由
-            app.use(`/api/${routePath}`, routeFile)
+            app.use(`/api/${routePath}`, privateMiddleWare, routeFile)
             // 配置静态文件入口
             app.use(`/${routePath === "blog" ? "" : routePath}`, express.static(path.resolve(__dirname, 'static', routePath)))
         })
