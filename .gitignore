@@ -27,3 +27,4 @@ config.json
 /uploads
 /static
 /logs
+/test

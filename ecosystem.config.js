@@ -10,7 +10,8 @@ module.exports = {
       "uploads",
       "logs",
       ".git",
-      "static"
+      "static",
+      "test"
     ],
     error_file: "./logs/app-err.log",
     out_file: "./logs/app-out.log"
