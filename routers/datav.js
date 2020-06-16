@@ -9,10 +9,7 @@ router.get('/components',(req,res)=>{
     })
 })
     .post('/component',async (req,res)=>{
-        req.body = {
-            name:"测试折线图",
-            codeName:"LineChart"
-        }
+        console.log(req.body)
         const result = await Datav_Component.insertMany(req.body)
         res.send(result[0])
     })
