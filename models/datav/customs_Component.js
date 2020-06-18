@@ -1,10 +1,16 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 
-// 示例组件
-const Datav_ComponentSchema = Schema({
+// 个人使用的组件
+const customs_Component = Schema({
+    parent_id:{
+        type:Schema.Types.ObjectId
+    },
+    customs_id:{    // 组件自身id
+        type:String,
+    },
     name: String,    //组件中文名
-    codeName: String,    //组件代码
+    codeName: String,    //组件代码名
     type: String,//| 组件类型 |
     x: Number,//| 组件x轴位置 |
     y: Number,//| 组件y轴位置 |
@@ -13,6 +19,6 @@ const Datav_ComponentSchema = Schema({
     children:Array  // 可能会使用的子组件
 });
 
-const Datav_Component = mongoose.model('datav_component', Datav_ComponentSchema)
+const Datav_Component = mongoose.model('customs_Component', customs_Component,'customs_component')
 
 module.exports = Datav_Component
