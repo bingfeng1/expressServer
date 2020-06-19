@@ -7,9 +7,6 @@ const customs_Component = Schema({
     parent_id:{
         type:Schema.Types.ObjectId
     },
-    customs_id:{    // 组件自身id
-        type:String,
-    },
     name: String,    //组件中文名
     codeName: String,    //组件代码名
     type: String,//| 组件类型 |

@@ -10,7 +10,6 @@ const Datav_ComponentSchema = Schema({
     y: Number,//| 组件y轴位置 |
     width: Number, //| 组件宽度 |
     height: Number,//| 组件高度 |
-    children:Array  // 可能会使用的子组件
 });
 
 const Datav_Component = mongoose.model('datav_component', Datav_ComponentSchema)
