@@ -163,6 +163,8 @@ background_extend_links
 - timedTask/index.js：定时任务的集成，有点类似react-redux的做法
 通过闭包，触发循环事件，以便以可以随时停止任务
 
+# 添加controller作为拆分出来的一层
+
 
 ## 字典
   
@@ -173,3 +175,9 @@ timed_tasks
 | name     | String  | 定时任务名称   |
 | desc     | String  | 定时任务描述   |
 | flag     | Boolean | 定时器是否开启 |
+
+# 大屏组件
+## api
+- components 获取所有组件信息
+- component 增删改单个组件（示例组件）
+- largeScreen 增删改查大屏
