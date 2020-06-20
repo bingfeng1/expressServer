@@ -53,7 +53,7 @@ router.get('/components', (req, res) => {
         res.send(result)
     })
 
-    保存自定义组件
+    // 保存自定义组件
     .post('/ownComponent', async (req, res) => {
         // 这里剔除原来的组件id
         let {_id,...obj} = req.body
