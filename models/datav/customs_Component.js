@@ -10,13 +10,14 @@ const customs_Component = Schema({
     name: String,    //组件中文名
     codeName: String,    //组件代码名
     type: String,//| 组件类型 |
-    x: Number,//| 组件x轴位置 |
-    y: Number,//| 组件y轴位置 |
-    width: Number, //| 组件宽度 |
-    height: Number,//| 组件高度 |
-    
+    attr:{  // 自身属性
+        x: Number,//| 组件x轴位置 |
+        y: Number,//| 组件y轴位置 |
+        width: Number, //| 组件宽度 |
+        height: Number,//| 组件高度 |
+    }
 });
 
-const Datav_Component = mongoose.model('customs_Component', customs_Component,'customs_component')
+const Customs_Component = mongoose.model('customs_Component', customs_Component,'customs_component')
 
-module.exports = Datav_Component
+module.exports = Customs_Component

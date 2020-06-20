@@ -181,3 +181,4 @@ timed_tasks
 - components 获取所有组件信息
 - component 增删改单个组件（示例组件）
 - largeScreen 增删改查大屏
+- ownComponent 自定义组件增删改查
