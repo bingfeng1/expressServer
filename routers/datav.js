@@ -61,6 +61,13 @@ router.get('/components', (req, res) => {
         res.send(result[0])
     })
 
+    // 修改组件
+    .put('/ownComponent',async (req,res)=>{
+        const { _id, ...arr } = req.body
+        const result = await Customs_Component.findByIdAndUpdate(_id, arr, { new: true })
+        res.send(result)
+    })
+
     .delete('/ownComponent', async (req, res) => {
         // 通过传入的id删除
         const result = await Customs_Component.deleteOne(req.body)
